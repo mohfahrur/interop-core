@@ -65,6 +65,7 @@ func main() {
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"user":  req.Name,
+			"item":  req.Item,
 			"email": req.Email,
 			"hp":    req.HP,
 		})
