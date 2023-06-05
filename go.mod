@@ -1,4 +1,4 @@
-module github.com/mohfahrur/interopCore
+module github.com/mohfahrur/interop-core
 
 go 1.19
 

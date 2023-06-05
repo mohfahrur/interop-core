@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	graphql "github.com/graph-gophers/graphql-go"
-	"github.com/mohfahrur/interopCore/entity"
-	usecase "github.com/mohfahrur/interopCore/usecase"
+	"github.com/mohfahrur/interop-core/entity"
+	usecase "github.com/mohfahrur/interop-core/usecase"
 )
 
 const schemaString = `
@@ -45,7 +45,7 @@ func main() {
 		})
 	})
 
-	r.POST("/rent", func(c *gin.Context) {
+	r.POST("/buy", func(c *gin.Context) {
 		bodyByte, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Println(err)

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/graph-gophers/graphql-go"
-	"github.com/mohfahrur/interopCore/entity"
+	"github.com/mohfahrur/interop-core/entity"
 )
 
 // Define mock data:
