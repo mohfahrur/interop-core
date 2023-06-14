@@ -1,4 +1,4 @@
-package usecase
+package user
 
 import (
 	"github.com/graph-gophers/graphql-go"
@@ -6,7 +6,7 @@ import (
 )
 
 // Define mock data:
-var users = []entity.User{
+var users = []entity.UserGQL{
 	{
 		UserID:     graphql.ID("u-001"),
 		Username:   "Rizky Wahyu Dewantoro",
@@ -41,15 +41,15 @@ var users = []entity.User{
 
 type RootResolver struct{}
 
-func (r *RootResolver) Users() ([]entity.User, error) {
+func (r *RootResolver) Users() ([]entity.UserGQL, error) {
 	return users, nil
 }
 
-func (r *RootResolver) User(args struct{ UserID graphql.ID }) (entity.User, error) {
+func (r *RootResolver) User(args struct{ UserID graphql.ID }) (entity.UserGQL, error) {
 	for _, user := range users {
 		if args.UserID == user.UserID {
 			return user, nil
 		}
 	}
-	return entity.User{}, nil
+	return entity.UserGQL{}, nil
 }

@@ -9,8 +9,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	graphql "github.com/graph-gophers/graphql-go"
+	interopaD "github.com/mohfahrur/interop-core/domain/interopa"
+	interopbD "github.com/mohfahrur/interop-core/domain/interopb"
+	interopcD "github.com/mohfahrur/interop-core/domain/interopc"
 	"github.com/mohfahrur/interop-core/entity"
-	usecase "github.com/mohfahrur/interop-core/usecase"
+	ticketUC "github.com/mohfahrur/interop-core/usecase/ticket"
+	userUC "github.com/mohfahrur/interop-core/usecase/user"
 )
 
 const schemaString = `
@@ -33,11 +37,20 @@ const schemaString = `
 
 var (
 	opts   = []graphql.SchemaOpt{graphql.UseFieldResolvers()}
-	Schema = graphql.MustParseSchema(schemaString, &usecase.RootResolver{}, opts...)
+	Schema = graphql.MustParseSchema(schemaString, &userUC.RootResolver{}, opts...)
 )
 
 func main() {
 	ctx := context.Background()
+
+	interopaDomain := interopaD.NewinteropaDomain()
+	interopbDomain := interopbD.NewinteropbDomain()
+	interopcDomain := interopcD.NewinteropcDomain()
+
+	TicketUsercase := ticketUC.NewTicketUsecase(*interopaDomain,
+		*interopbDomain,
+		*interopcDomain)
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -54,7 +67,7 @@ func main() {
 			})
 			return
 		}
-		var req entity.FERequest
+		var req entity.FERequestGQL
 		err = json.Unmarshal(bodyByte, &req)
 		if err != nil {
 			log.Println(err)
@@ -71,6 +84,46 @@ func main() {
 		})
 	})
 
+	r.POST("/v2/buy", func(c *gin.Context) {
+		bodyByte, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusOK, gin.H{
+				"message": "error",
+			})
+			return
+		}
+		var req entity.User
+		err = json.Unmarshal(bodyByte, &req)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusOK, gin.H{
+				"message": "error",
+			})
+			return
+		}
+		err = TicketUsercase.SendNotifikasi(req)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusOK, gin.H{
+				"message": "error",
+			})
+			return
+		}
+		err = TicketUsercase.UpdateData(req)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusOK, gin.H{
+				"message": "error",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "success",
+		})
+	})
+
 	r.GET("/graphql", func(c *gin.Context) {
 		var params entity.ClientQuery
 		err := json.NewDecoder(c.Request.Body).Decode(&params)
@@ -81,5 +134,5 @@ func main() {
 
 		c.JSON(http.StatusOK, resp1)
 	})
-	r.Run()
+	r.Run(":8000")
 }
