@@ -3,6 +3,7 @@ module github.com/mohfahrur/interop-core
 go 1.19
 
 require (
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/graph-gophers/graphql-go v1.5.0
 )

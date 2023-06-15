@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	graphql "github.com/graph-gophers/graphql-go"
 	interopaD "github.com/mohfahrur/interop-core/domain/interopa"
@@ -41,6 +42,7 @@ var (
 )
 
 func main() {
+	log.SetFlags(log.Llongfile)
 	ctx := context.Background()
 
 	interopaDomain := interopaD.NewinteropaDomain()
@@ -52,6 +54,7 @@ func main() {
 		*interopcDomain)
 
 	r := gin.Default()
+	r.Use(cors.Default())
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong from core",
@@ -62,7 +65,7 @@ func main() {
 		bodyByte, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error",
 			})
 			return
@@ -71,7 +74,7 @@ func main() {
 		err = json.Unmarshal(bodyByte, &req)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error",
 			})
 			return
@@ -97,7 +100,7 @@ func main() {
 		err = json.Unmarshal(bodyByte, &req)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error",
 			})
 			return
@@ -105,7 +108,7 @@ func main() {
 		err = TicketUsercase.SendNotifikasi(req)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error",
 			})
 			return
@@ -113,12 +116,11 @@ func main() {
 		err = TicketUsercase.UpdateData(req)
 		if err != nil {
 			log.Println(err)
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error",
 			})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"message": "success",
 		})
@@ -134,5 +136,6 @@ func main() {
 
 		c.JSON(http.StatusOK, resp1)
 	})
+
 	r.Run(":8000")
 }
